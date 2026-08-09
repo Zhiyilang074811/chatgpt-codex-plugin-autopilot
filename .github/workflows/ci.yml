@@ -28,7 +28,7 @@ jobs:
         run: |
           unzip -t dist/chatgpt-codex-plugin-autopilot-*.zip
           unzip -Z1 dist/chatgpt-codex-plugin-autopilot-*.zip
-          sha256sum -c dist/SHA256SUMS
+          cd dist && sha256sum -c SHA256SUMS
 
       - name: Upload verified artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
