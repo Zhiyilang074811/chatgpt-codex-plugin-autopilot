@@ -29,7 +29,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertIn("cmp", text)
         self.assertIn("gh release create", text)
         self.assertIn("SHA256SUMS", text)
-        self.assertIn("cd dist-a && sha256sum -c SHA256SUMS", text)
+        self.assertIn("(cd dist-a && sha256sum -c SHA256SUMS)", text)
         self.assertRegex(text, r"actions/checkout@[0-9a-f]{40}")
         self.assertNotRegex(text, r"(?i)npm\s+publish|twine\s+upload")
 

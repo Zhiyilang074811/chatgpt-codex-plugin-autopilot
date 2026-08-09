@@ -43,7 +43,7 @@ jobs:
           test ${#b[@]} -eq 1
           cmp -- "${a[0]}" "${b[0]}"
           cmp -- dist-a/SHA256SUMS dist-b/SHA256SUMS
-          cd dist-a && sha256sum -c SHA256SUMS
+          (cd dist-a && sha256sum -c SHA256SUMS)
           unzip -t "${a[0]}"
           unzip -Z1 "${a[0]}"
 
