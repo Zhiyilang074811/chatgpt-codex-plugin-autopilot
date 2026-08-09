@@ -1,0 +1,59 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+
+      - name: Verify tag matches manifest version
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(python3 -c 'import json; print(json.load(open(".codex-plugin/plugin.json"))["version"])')"
+          test "$GITHUB_REF_NAME" = "v$version"
+
+      - name: Unit tests
+        run: python3 -m unittest discover -s tests -v
+
+      - name: Self-check
+        run: python3 scripts/self_check.py
+
+      - name: Build twice
+        run: |
+          python3 scripts/build_release.py --out-dir dist-a
+          python3 scripts/build_release.py --out-dir dist-b
+
+      - name: Verify deterministic package and archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          a=(dist-a/chatgpt-codex-plugin-autopilot-*.zip)
+          b=(dist-b/chatgpt-codex-plugin-autopilot-*.zip)
+          test ${#a[@]} -eq 1
+          test ${#b[@]} -eq 1
+          cmp -- "${a[0]}" "${b[0]}"
+          cmp -- dist-a/SHA256SUMS dist-b/SHA256SUMS
+          sha256sum -c dist-a/SHA256SUMS
+          unzip -t "${a[0]}"
+          unzip -Z1 "${a[0]}"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            dist-a/chatgpt-codex-plugin-autopilot-*.zip \
+            dist-a/SHA256SUMS \
+            --verify-tag \
+            --generate-notes \
+            --title "$GITHUB_REF_NAME"

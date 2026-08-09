@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+
+      - name: Unit tests
+        run: python3 -m unittest discover -s tests -v
+
+      - name: Self-check
+        run: python3 scripts/self_check.py
+
+      - name: Build release asset
+        run: python3 scripts/build_release.py --out-dir dist
+
+      - name: Inspect archive
+        run: |
+          unzip -t dist/chatgpt-codex-plugin-autopilot-*.zip
+          unzip -Z1 dist/chatgpt-codex-plugin-autopilot-*.zip
+          sha256sum -c dist/SHA256SUMS
+
+      - name: Upload verified artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: plugin-autopilot
+          path: |
+            dist/chatgpt-codex-plugin-autopilot-*.zip
+            dist/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 7
