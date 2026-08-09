@@ -11,6 +11,8 @@ import sys
 import zipfile
 from pathlib import Path
 
+# Prevent transient bytecode inside the plugin root from entering deterministic archives.
+sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from validate_plugin import MAX_ARCHIVE, validate_plugin  # noqa: E402
 

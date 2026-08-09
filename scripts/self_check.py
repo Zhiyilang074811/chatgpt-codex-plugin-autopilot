@@ -23,7 +23,7 @@ def stage_plugin(destination: Path) -> Path:
         source = ROOT / rel
         target = destination / rel
         if source.is_dir():
-            shutil.copytree(source, target)
+            shutil.copytree(source, target, ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "*.pyo"))
         elif source.is_file():
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, target)

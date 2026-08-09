@@ -20,6 +20,22 @@ class SelfHostingTests(unittest.TestCase):
         self.assertEqual(report["architecture"], "skills-only")
         self.assertEqual(report["skills"], 1)
 
+    def test_validator_rejects_transient_python_bytecode(self):
+        with tempfile.TemporaryDirectory() as temp:
+            stage = Path(temp) / "plugin"
+            subprocess.run(["python3", "scripts/self_check.py", "--json"], cwd=ROOT, check=True, capture_output=True, text=True)
+            import sys
+            sys.path.insert(0, str(ROOT / "scripts"))
+            from self_check import stage_plugin
+            stage_plugin(stage)
+            cache = stage / "skills/chatgpt-codex-plugin-autopilot/scripts/__pycache__"
+            cache.mkdir(parents=True)
+            (cache / "validate_plugin.cpython-312.pyc").write_bytes(b"transient")
+            validator = stage / "skills/chatgpt-codex-plugin-autopilot/scripts/validate_plugin.py"
+            proc = subprocess.run(["python3", str(validator), str(stage), "--json"], text=True, capture_output=True)
+            self.assertNotEqual(proc.returncode, 0, proc.stdout)
+            self.assertIn("bytecode", proc.stdout.lower())
+
     def test_release_build_is_deterministic_and_installable(self):
         with tempfile.TemporaryDirectory() as temp:
             out = Path(temp)

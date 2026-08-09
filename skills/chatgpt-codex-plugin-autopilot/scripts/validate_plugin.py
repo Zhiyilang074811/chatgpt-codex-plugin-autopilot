@@ -295,6 +295,10 @@ def _walk(root: Path, errors: list[str], exclusions: list[str]) -> tuple[list[Pa
         current_path = Path(current)
         for name in list(dirs):
             path = current_path / name
+            if name == "__pycache__":
+                _error(errors, f"transient Python bytecode cache is not allowed in public plugin: {path.relative_to(root)}")
+                dirs.remove(name)
+                continue
             if path.is_symlink():
                 _error(errors, f"symlink is not allowed in public plugin: {path.relative_to(root)}")
                 dirs.remove(name)
@@ -329,6 +333,8 @@ def _walk(root: Path, errors: list[str], exclusions: list[str]) -> tuple[list[Pa
             base = path.name
             if base in {".DS_Store", "Thumbs.db"} or base.startswith("._"):
                 _error(errors, f"operating-system metadata is not allowed: {rel}")
+            if base.endswith((".pyc", ".pyo")):
+                _error(errors, f"transient Python bytecode is not allowed in public plugin: {rel}")
             if SECRET_BASENAME.match(base):
                 _error(errors, f"secret-shaped file is not allowed in public plugin: {rel}")
             normalized_key = unicodedata.normalize("NFC", rel).casefold()
