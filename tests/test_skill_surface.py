@@ -1,0 +1,36 @@
+import re
+import unittest
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+SKILL = ROOT / "skills" / "chatgpt-codex-plugin-autopilot"
+
+class SkillSurfaceTests(unittest.TestCase):
+    def test_required_skill_files_exist(self):
+        required = [
+            "SKILL.md",
+            "agents/openai.yaml",
+            "references/architectures.md",
+            "references/official-contract.md",
+            "references/release-playbook.md",
+            "references/submission-errors.md",
+            "scripts/validate_plugin.py",
+            "scripts/package_plugin.py",
+        ]
+        for rel in required:
+            self.assertTrue((SKILL / rel).is_file(), rel)
+
+    def test_skill_frontmatter_is_discoverable(self):
+        text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+        self.assertRegex(text, r"(?m)^name:\s*chatgpt-codex-plugin-autopilot$")
+        description = re.search(r"(?m)^description:\s*(.+)$", text)
+        self.assertIsNotNone(description)
+        self.assertTrue(description.group(1).startswith("Use when "))
+
+    def test_skill_contains_self_hosting_release_requirements(self):
+        text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+        for phrase in ("official OpenAI Plugin", "deterministic", "Full Autopilot Publish", "public-distribution safety"):
+            self.assertIn(phrase, text)
+
+if __name__ == "__main__":
+    unittest.main()
