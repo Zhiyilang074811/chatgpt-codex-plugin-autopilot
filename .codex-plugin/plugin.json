@@ -1,0 +1,34 @@
+{
+  "name": "chatgpt-codex-plugin-autopilot",
+  "version": "0.1.0",
+  "description": "Generic autopilot for building, validating, packaging, and releasing ChatGPT/Codex Plugins",
+  "author": {
+    "name": "Mamdouh Aboammar",
+    "url": "https://github.com/imMamdouhaboammar"
+  },
+  "license": "MIT",
+  "keywords": ["chatgpt", "codex", "plugins", "skills", "developer-tools", "release"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Plugin Autopilot",
+    "shortDescription": "Build and ship plugins",
+    "longDescription": "Audits arbitrary repositories, builds or repairs ChatGPT/Codex Plugin configuration, validates final directory requirements, packages deterministic installable ZIPs, and runs release gates before publication.",
+    "developerName": "Mamdouh Aboammar",
+    "category": "Developer Tools",
+    "capabilities": ["Plugin architecture audit", "Plugin validation", "Deterministic packaging", "Release verification"],
+    "websiteURL": "https://github.com/imMamdouhaboammar/chatgpt-codex-plugin-autopilot",
+    "defaultPrompt": [
+      "Audit this repository and make its ChatGPT/Codex Plugin production-ready.",
+      "Validate and package this repository as an installable ChatGPT/Codex Plugin.",
+      "Diagnose this Plugin submission failure and repair the root cause."
+    ],
+    "brandColor": "#1F5EFF",
+    "composerIcon": "./assets/mark.svg",
+    "logo": "./assets/mark.svg",
+    "privacyPolicyURL": "https://github.com/imMamdouhaboammar/chatgpt-codex-plugin-autopilot/blob/main/PRIVACY.md",
+    "termsOfServiceURL": "https://github.com/imMamdouhaboammar/chatgpt-codex-plugin-autopilot/blob/main/TERMS.md",
+    "supportURL": "https://github.com/imMamdouhaboammar/chatgpt-codex-plugin-autopilot/blob/main/SUPPORT.md"
+  },
+  "homepage": "https://github.com/imMamdouhaboammar/chatgpt-codex-plugin-autopilot",
+  "repository": "https://github.com/imMamdouhaboammar/chatgpt-codex-plugin-autopilot"
+}
