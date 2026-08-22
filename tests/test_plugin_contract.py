@@ -12,7 +12,7 @@ class PluginContractTests(unittest.TestCase):
     def test_manifest_declares_standalone_skill_only_plugin(self):
         data = json.loads(MANIFEST.read_text(encoding="utf-8"))
         self.assertEqual(data["name"], "chatgpt-codex-plugin-autopilot")
-        self.assertEqual(data["version"], "0.3.0")
+        self.assertEqual(data["version"], "0.4.0")
         self.assertEqual(data["skills"], "./skills/")
         self.assertNotIn("mcpServers", data)
         self.assertNotIn("apps", data)
@@ -26,6 +26,9 @@ class PluginContractTests(unittest.TestCase):
         self.assertLessEqual(len(interface["developerName"]), 80)
         self.assertEqual(interface["category"], "Developer Tools")
         self.assertIn("Submission preflight", interface["capabilities"])
+        self.assertIn("Workflow-to-Skill conversion", interface["capabilities"])
+        self.assertIn("SVG brand identity pack", interface["capabilities"])
+        self.assertIn("Plugin Directory listing pack", interface["capabilities"])
         for key in ("websiteURL", "privacyPolicyURL", "termsOfServiceURL"):
             self.assertTrue(interface[key].startswith("https://"), key)
         self.assertNotIn("supportURL", interface)
@@ -37,6 +40,8 @@ class PluginContractTests(unittest.TestCase):
             value = interface[key]
             self.assertTrue(value.startswith("./"), key)
             self.assertTrue((ROOT / value[2:]).is_file(), value)
+        self.assertEqual(interface["logo"], "./assets/logo-light.svg")
+        self.assertTrue((ROOT / "assets/logo-dark.svg").is_file())
 
     def test_codex_plugin_directory_contains_manifest_only(self):
         entries = sorted(path.name for path in (ROOT / ".codex-plugin").iterdir())
@@ -75,8 +80,8 @@ class PluginContractTests(unittest.TestCase):
         self.assertEqual(plugin["longDescription"], manifest["interface"]["longDescription"])
         self.assertEqual(packet["starterPrompts"], manifest["interface"]["defaultPrompt"])
         self.assertTrue(plugin["supportURL"].startswith("https://"))
-        self.assertEqual(len(packet["positiveTests"]), 5)
-        self.assertEqual(len(packet["negativeTests"]), 3)
+        self.assertGreaterEqual(len(packet["positiveTests"]), 5)
+        self.assertGreaterEqual(len(packet["negativeTests"]), 3)
         for case in packet["positiveTests"]:
             self.assertTrue(case["userPrompt"])
             self.assertTrue(case["expectedBehavior"])
@@ -95,8 +100,11 @@ class PluginContractTests(unittest.TestCase):
             "SUPPORT.md",
             "LICENSE",
             "assets/mark.svg",
+            "assets/logo-light.svg",
+            "assets/logo-dark.svg",
             ".agents/plugins/marketplace.json",
             "submission/reviewer-packet.json",
+            "submission/listing.json",
         ):
             self.assertTrue((ROOT / rel).is_file(), rel)
 
